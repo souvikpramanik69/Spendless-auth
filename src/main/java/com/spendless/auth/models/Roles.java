@@ -24,7 +24,7 @@ public class Roles {
     @Column(name = "id", updatable = false, nullable = false)
     private String id;
 
-    @Size(min = 2,max = 10,message = "Name must be between 2 and 10")
+    @Size(min = 2,max = 40,message = "Name must be between 2 and 10")
     private String name;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade=CascadeType.ALL)

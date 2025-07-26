@@ -6,6 +6,7 @@ import com.spendless.auth.models.Phone;
 import com.spendless.auth.models.Roles;
 import com.spendless.auth.models.Users;
 import com.spendless.auth.payload.UserPayload;
+import com.spendless.auth.repositories.RoleRepository;
 import com.spendless.auth.repositories.UserRepository;
 import com.spendless.auth.services.UserService;
 import com.spendless.auth.services.JWTService;
@@ -22,6 +23,10 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository repo;
+
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Autowired
     private JWTService jwtUtil;
@@ -46,10 +51,13 @@ public class UserServiceImpl implements UserService {
             newUser.setLast_name(payload.getLast_name());
             newUser.setAccessToken(accessToken);
             newUser.setRefreshToken(refreshToken);
-            List<Roles> rolesList = payload.getRoles();
-            rolesList.get(0).setId(UUID.randomUUID().toString());
+            String roles = "ROLE_"+payload.getRoles();
+            Roles role = roleRepository.findByName(roles)
+                    .orElseThrow(() -> new RuntimeException("Role not found"));
+            List<Roles> roleList = new ArrayList<Roles>();
+            roleList.add(role);
+            newUser.setRoles(roleList);
 
-            newUser.setRoles(rolesList);
 
             List<Phone> phones = payload.getPhone();
                phones.get(0).setUpdatedAt(LocalDateTime.now());

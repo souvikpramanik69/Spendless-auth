@@ -26,6 +26,9 @@ public class AdminUserInitializer {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    private JWTService jwtService;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -37,9 +40,12 @@ public class AdminUserInitializer {
     @Bean
     public CommandLineRunner addAdmin() {
 return args -> {
-
-    Optional<Users> isUserExist = userRepository.findByUsername("admin@123");
+    String username = "admin@123";
+    String rawPassword = "testdev";
+    Optional<Users> isUserExist = userRepository.findByUsername(username);
     if (isUserExist.isEmpty()) {
+        String accessToken  = jwtService.generateAccessToken(username);
+        String refreshToken  = jwtService.generateRefreshToken(username);
         Address adminAddress = new Address();
         adminAddress.setId(UUID.randomUUID().toString());
         adminAddress.setAddress1("Kolkata");
@@ -65,8 +71,10 @@ return args -> {
         adminUser.setLast_name("User");
         adminUser.setId(UUID.randomUUID().toString());
         adminUser.setEmail("spendlessadmin@gmail.com");
+        adminUser.setAccessToken(accessToken);
+        adminUser.setRefreshToken(refreshToken);
 
-        String rawPassword = "testdev";
+
         String encodedPassword = passwordEncoder().encode(rawPassword);
         adminUser.setPassword(encodedPassword);
 
@@ -75,6 +83,8 @@ return args -> {
          newRole.setName("ROLE_ADMIN");
 
          List<Roles> roleList = new ArrayList<Roles>();
+         roleList.add(newRole);
+
 
 
         List<Address> addressList = new ArrayList<Address>();

@@ -9,8 +9,11 @@ import com.spendless.auth.services.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.naming.NoPermissionException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class RoleServiceImpl implements RoleService {
@@ -45,6 +48,31 @@ public class RoleServiceImpl implements RoleService {
            return 2;
        }
 
+    }
+
+
+    public Roles addRole(RolePayload payload) throws NoPermissionException {
+        Optional<Roles> isRoleExist = roleRepository.findByName("ROLE_" + payload.getName());
+
+
+        if (isRoleExist.isPresent()) {
+            System.out.println("Role already exists.");
+            return null;
+        } else {
+            Roles isUserExistByRole = roleRepository.findRoleByUserIdAndName(payload.getUserId(), "ROLE_ADMIN");
+ 
+            if (isUserExistByRole !=  null) {
+                Roles newRole = new Roles();
+                newRole.setId(UUID.randomUUID().toString());
+                System.out.println("Running Role: ");
+                newRole.setName("ROLE_" + payload.getName());
+                newRole.setUsers(new ArrayList<>());
+
+                return roleRepository.save(newRole);
+            } else {
+                throw new NoPermissionException("You don't have any permission to access it.");
+            }
+        }
     }
 
 

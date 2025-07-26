@@ -13,10 +13,10 @@ spring:
       name: user@123
       password: user
   datasource:
-#    url: jdbc:postgresql://localhost:5432/spendless-auth
-#    username: postgres
-#    password: Souvikp683@
-    url: jdbc:postgresql://ep-wandering-mode-a1125o7i-pooler.ap-southeast-1.aws.neon.tech/SpendlessAuth?user=neondb_owner&password=npg_nDp91cxGVerA&sslmode=require&channelBinding=require
+    url: jdbc:postgresql://localhost:5432/spendless-auth
+    username: postgres
+    password: Souvikp683@
+#    url: jdbc:postgresql://ep-wandering-mode-a1125o7i-pooler.ap-southeast-1.aws.neon.tech/SpendlessAuth?user=neondb_owner&password=npg_nDp91cxGVerA&sslmode=require&channelBinding=require
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

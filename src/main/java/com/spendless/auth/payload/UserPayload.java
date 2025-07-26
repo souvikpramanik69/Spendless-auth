@@ -54,8 +54,7 @@ public class UserPayload {
 
     private boolean isDeleted;
 
-
-    private List<Roles> roles;
+    private String roles;
 
 
     public UserPayload(String email,String password){

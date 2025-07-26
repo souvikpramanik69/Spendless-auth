@@ -2,11 +2,13 @@ package com.spendless.auth.controllers;
 
 import com.spendless.auth.dto.RoleDto;
 import com.spendless.auth.mapper.RoleMapper;
+import com.spendless.auth.mapper.UserMapper;
 import com.spendless.auth.models.Roles;
 import com.spendless.auth.payload.RolePayload;
 import com.spendless.auth.response.ApiResponse;
 import com.spendless.auth.services.Impl.RoleServiceImpl;
 import com.spendless.auth.services.RoleService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.management.relation.Role;
+import javax.management.relation.RoleNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,6 +74,28 @@ public class RoleController {
         }
     }
 
+    @PostMapping("/role/add")
+    public ResponseEntity<ApiResponse<RoleDto,Object>> addRole( @RequestBody @Valid RolePayload payload) throws RoleNotFoundException {
+        ApiResponse<RoleDto,Object> response;
+try{
+    Roles result = roleService.addRole(payload);
+
+    if(result == null){
+        throw  new RoleNotFoundException("Role already exist");
+    }
+    else {
+        response = new ApiResponse<RoleDto,Object>
+                (201,"Role created successfully", ApiResponse.Status.SUCCESS, RoleMapper.mapToDto(result));
+return new ResponseEntity<ApiResponse<RoleDto,Object>>(response,HttpStatus.CREATED);
+    }
+}catch (Exception e){
+    response = new ApiResponse<RoleDto,Object>
+            (500,e.getMessage(), ApiResponse.Status.ERROR);
+    return new ResponseEntity<ApiResponse<RoleDto,Object>>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+}
+    }
+
+
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<ApiResponse<Object,Object>> invalidUser(MethodArgumentNotValidException ex) {
         List<String> errorList = new ArrayList<String>();
@@ -81,6 +106,20 @@ public class RoleController {
         ApiResponse<Object,Object> response = new ApiResponse<>(401, errorList, ApiResponse.Status.ERROR, null);
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<Object,Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        List<String> errorList = new ArrayList<String>();
+        for (org.springframework.validation.FieldError
+                error : ex.getBindingResult().getFieldErrors()) {
+            errorList.add(error.getDefaultMessage());
+        }
+        ApiResponse<Object,Object> response = new ApiResponse<>(400, errorList, ApiResponse.Status.ERROR, null);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+
+
+
     }
 
 

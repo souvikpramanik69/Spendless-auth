@@ -22,6 +22,8 @@ public class RootController {
         return new ResponseEntity<ApiResponse<String,Object>>(response, HttpStatus.NOT_FOUND);
     }
 
+
+
     //----------------------------Form Validation Exception---------------------------------------------
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Object,Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {

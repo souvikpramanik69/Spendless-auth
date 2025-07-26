@@ -17,12 +17,25 @@ public class RolePayload {
     String id;
 
     @NotBlank(message = "Role name can't be empty")
-    @Size(min = 2,max = 10,message = "Name should be between 2 and 10 character's")
+//    @Size(min = 2,max = 10,message = "Name should be between 2 and 10 character's")
     String name;
+
+
+    String userId;
 
 
     @Valid
     List<Users> users;
+
+//    public RolePayload(String name,String userId){
+//    this.name = name;
+//    this.userId = userId;
+//    }
+//
+//    public RolePayload(String name,List<Users> users){
+//        this.name = name;
+//        this.users = users;
+//    }
 
 
 
