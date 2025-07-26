@@ -22,6 +22,12 @@ public class RootController {
         return new ResponseEntity<ApiResponse<String,Object>>(response, HttpStatus.NOT_FOUND);
     }
 
+    @GetMapping("/")
+    public ResponseEntity<ApiResponse<String,Object>> root(){
+        ApiResponse<String,Object> response = new ApiResponse<String,Object>(200,"Welcome to SpendLess Service", ApiResponse.Status.SUCCESS);
+        return new ResponseEntity<ApiResponse<String,Object>>(response, HttpStatus.NOT_FOUND);
+    }
+
 
 
     //----------------------------Form Validation Exception---------------------------------------------

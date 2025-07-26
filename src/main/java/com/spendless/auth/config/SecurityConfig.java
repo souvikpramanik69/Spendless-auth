@@ -39,7 +39,7 @@ public class SecurityConfig {
         formLogin(Customizer->Customizer.disable())
        .csrf(csrf -> csrf.disable())
        .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll() // Allow without auth
+                .requestMatchers("/api/auth/**").permitAll().requestMatchers("/").permitAll() // Allow without auth
                 .anyRequest().authenticated() // All others need auth
         ).addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
 
