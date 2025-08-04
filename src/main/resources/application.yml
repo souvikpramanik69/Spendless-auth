@@ -44,5 +44,5 @@ logbook:
 
 logging:
   level:
-    root: INFO                # ✅ ADD THIS
+    root: INFO
     org.zalando.logbook: TRACE

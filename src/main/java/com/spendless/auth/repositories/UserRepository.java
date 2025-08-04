@@ -43,6 +43,9 @@ public interface UserRepository extends JpaRepository<Users,String> {
                                                  @Param("name") String name,
                                                  Pageable pageable);
 
+    @Query(value = "select * from users where refresh_token = :refreshToken",nativeQuery = true)
+    Optional<Users> findByRefreshToken(@Param("refreshToken") String refreshToken);
+
 
     Page<Users> findByIsDeleted(boolean isDeleted, Pageable pageable);
 

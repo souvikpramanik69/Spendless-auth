@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -52,7 +53,7 @@ public class UserController {
             return new ResponseEntity<ApiResponse<UserDto,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/user")
     public ResponseEntity<ApiResponse<Integer,Object>> deleteUser( @RequestParam("id") String id){
        ApiResponse<Integer,Object> response;
@@ -72,7 +73,7 @@ public class UserController {
        }
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/users")
     public ResponseEntity<ApiResponse<List<UserDto>,Object>> allUsers(
             @RequestParam("isdeleted") boolean isDeleted,

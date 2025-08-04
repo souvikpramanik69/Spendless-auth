@@ -1,11 +1,14 @@
 package com.spendless.auth.controllers;
 
 
+import com.spendless.auth.dto.RefreshTokenDto;
 import com.spendless.auth.models.Users;
 import com.spendless.auth.dto.UserDto;
 import com.spendless.auth.mapper.UserMapper;
 import com.spendless.auth.payload.AuthPayload;
+import com.spendless.auth.payload.RefreshTokenPayload;
 import com.spendless.auth.payload.UserPayload;
+import com.spendless.auth.repositories.UserRepository;
 import com.spendless.auth.response.ApiResponse;
 import com.spendless.auth.services.Impl.UserServiceImpl;
 import com.spendless.auth.services.JWTService;
@@ -13,6 +16,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -37,6 +41,9 @@ public class AuthController {
     @Autowired
     AuthenticationManager authManager;
 
+    @Autowired
+    UserRepository userRepository;
+
     //    @Secured("USER")
     @PostMapping("/auth/register")
     public ResponseEntity<ApiResponse<UserDto, Object>> register(@Valid @RequestBody UserPayload payload) {
@@ -60,6 +67,27 @@ public class AuthController {
 
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<Object,Object>> refreshToken(@RequestBody RefreshTokenPayload payload){
+      try{
+          RefreshTokenDto result =  authService.refreshToken(payload);
+          if(result != null){
+              return new ResponseEntity<ApiResponse<Object,Object>>
+                      (new ApiResponse<Object,Object>(200,"Refresh token generated successfully", ApiResponse.Status.SUCCESS,result),HttpStatus.OK);
+
+          }
+          else {
+              return new ResponseEntity<ApiResponse<Object,Object>>
+                      (new ApiResponse<Object,Object>(404,"Invalid Refresh Token or User doesn't exist", ApiResponse.Status.ERROR),HttpStatus.NOT_FOUND);
+          }
+      }catch (Exception e){
+          return new ResponseEntity<ApiResponse<Object,Object>>
+                  (new ApiResponse<Object,Object>(500,e.getMessage(), ApiResponse.Status.ERROR),HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+
+    }
+
+
     @PostMapping("/auth/login")
     public ResponseEntity<ApiResponse<UserDto,Object>> login(@RequestBody @Valid AuthPayload payload) {
         try {
@@ -77,7 +105,9 @@ public class AuthController {
                     user.setRefreshToken(refreshToken);
                     user.setAccessToken(accessToken);
 //                    logger.info("User {} authenticated successfully", payload.getUsername());
-                    UserDto userDto = UserMapper.mapToDto(user); // Map Users to UserDto
+                    UserDto userDto = UserMapper.mapToDto(user);
+                    // Map Users to UserDto
+                    userRepository.save(user);
                     return ResponseEntity.ok(
                             new ApiResponse<>(
                                     HttpStatus.OK.value(),

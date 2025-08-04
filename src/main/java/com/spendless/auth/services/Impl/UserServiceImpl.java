@@ -1,10 +1,12 @@
 package com.spendless.auth.services.Impl;
 
 
+import com.spendless.auth.dto.RefreshTokenDto;
 import com.spendless.auth.models.Address;
 import com.spendless.auth.models.Phone;
 import com.spendless.auth.models.Roles;
 import com.spendless.auth.models.Users;
+import com.spendless.auth.payload.RefreshTokenPayload;
 import com.spendless.auth.payload.UserPayload;
 import com.spendless.auth.repositories.RoleRepository;
 import com.spendless.auth.repositories.UserRepository;
@@ -107,6 +109,24 @@ public class UserServiceImpl implements UserService {
 
         List<Users> allUsers = repo.getAllUsers(isDeleted);
         return allUsers;
+    }
+
+    public RefreshTokenDto refreshToken(RefreshTokenPayload payload){
+        Optional<Users> users = repo.findByRefreshToken(payload.getRefreshToken());
+        System.out.println("Refresh Token getting data " + users);
+
+        if(users.isPresent()){
+            String accessToken = jwtUtil.generateAccessToken(users.get().getUsername());
+            users.get().setAccessToken(accessToken);
+            repo.save(users.get());
+            RefreshTokenDto dtoData = new RefreshTokenDto();
+            dtoData.setAccessToken(accessToken);
+            dtoData.setRefreshToken(payload.getRefreshToken());
+
+            return dtoData;
+        }
+        else return  null;
+
     }
 
     
